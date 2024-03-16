@@ -31,7 +31,7 @@ app.use(express.json());
 // Define a POST route for the algorithm
 app.post("/dijkstra", (req, res) => {
   const {
-    theNeighbors,
+    graphAdjacencyList,
     edgeWeightMap: edgeWeightArray,
     isOriented,
     source,
@@ -39,13 +39,13 @@ app.post("/dijkstra", (req, res) => {
 
   // package it up for the script
   const pythonInput = JSON.stringify({
-    theNeighbors,
+    graphAdjacencyList,
     edgeWeights: edgeWeightArray, // Ensure this matches the Python script's expectations
     isOriented,
     source,
   });
+  //   console.log("Python Input:", pythonInput);
 
-  console.log(pythonInput);
   // Spawn the Python subprocess
   const pythonProcess = spawn("python3", ["dijkstras.py"]);
 
@@ -57,22 +57,34 @@ app.post("/dijkstra", (req, res) => {
 
   // Handle data event from stdout
   pythonProcess.stdout.on("data", (data) => {
-    result += data.toString(); // Append the data to the result variable
+    console.log("Raw output from Python script:", data.toString());
+    result += data.toString();
   });
 
   // Handle data event from stderr (log errors, if any)
   pythonProcess.stderr.on("data", (data) => {
-    console.error(`stderr: ${data}`);
+    console.error(`stderr: ${data.toString()}`);
   });
 
   // Handle the close event of the subprocess
   pythonProcess.on("close", (code) => {
     if (code === 0) {
-      const parsedResult = JSON.parse(result);
-      res.status(200).json(parsedResult);
+      try {
+        const parsedResult = JSON.parse(result);
+        res.status(200).json(parsedResult);
+      } catch (error) {
+        // Correctly catch and log JSON parsing errors
+        console.error("Error parsing JSON from Python script:", error);
+        res
+          .status(500)
+          .send(
+            "Error processing Dijkstra's algorithm due to JSON parsing error."
+          );
+      }
     } else {
-      // Error
-      console.error("Error parsing JSON from Python script:", error);
+      // Log a generic error message or include more details if available
+      console.error("Python script exited with code", code);
+      //   console.error("test?");
       res.status(500).send("Error processing Dijkstra's algorithm");
     }
   });
