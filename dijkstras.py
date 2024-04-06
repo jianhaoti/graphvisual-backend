@@ -60,10 +60,11 @@ def dijkstras(graphAdjacencyList, edgeWeights, source, isOriented):
                     if not isOriented:
                         edgeStatus[reverseEdge] = "queued"
                     
-            else:
+            elif currentEdge not in edgeStatus:
                 edgeStatus[currentEdge] = "useless"
                 if not isOriented:
                     edgeStatus[reverseEdge] = "useless"
+                
 
         #* nodes: yellow -> orange
         #* edges: yellow -> orange or opaque

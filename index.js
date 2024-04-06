@@ -37,6 +37,8 @@ app.post("/dijkstra", (req, res) => {
     source,
   } = req.body;
 
+  // console.log(req.body);
+
   // package it up for the script
   const pythonInput = JSON.stringify({
     graphAdjacencyList,
@@ -57,7 +59,7 @@ app.post("/dijkstra", (req, res) => {
 
   // Handle data event from stdout
   pythonProcess.stdout.on("data", (data) => {
-    console.log("Raw output from Python script:", data.toString());
+    // console.log("Raw output from Python script:", data.toString());
     result += data.toString();
   });
 
