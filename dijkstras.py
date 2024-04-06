@@ -60,7 +60,7 @@ def dijkstras(graphAdjacencyList, edgeWeights, source, isOriented):
                     if not isOriented:
                         edgeStatus[reverseEdge] = "queued"
                     
-            elif edgeStatus.get(currentEdge) == "unvisited":
+            else:
                 edgeStatus[currentEdge] = "useless"
                 if not isOriented:
                     edgeStatus[reverseEdge] = "useless"
