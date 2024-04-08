@@ -21,19 +21,27 @@ def dijkstras(graphAdjacencyList, edgeWeights, source, isOriented):
     currentShortest = {node: float('inf') for node in graphAdjacencyList}
     currentShortest[source] = 0
 
+    prevNode = {node: None for node in graphAdjacencyList} # keep track of previous node
+
     steps = []  
 
     while prioQueue:
         # pop out next shortest guy from source
         currentDistance, processing = heapq.heappop(prioQueue)
+        if nodeStatus[processing] == "visited":
+            continue # skips this iteration if the node is already visited
+        
         nodeStatus[processing] = "processing"
 
         for node in nodeStatus:
             changeEdge = f"{node}-{processing}"
             if (nodeStatus[node]=="visited" and edgeStatus.get(changeEdge)== "queued"):
-                edgeStatus[changeEdge] = "visited"
-                if not isOriented:
-                    edgeStatus[f"{processing}-{node}"] = "visited"
+                if (prevNode[processing] == node):
+                    edgeStatus[changeEdge] = "visited"
+                    if not isOriented:
+                        edgeStatus[f"{processing}-{node}"] = "visited"
+                else:
+                    edgeStatus[changeEdge] = "useless"
             
         #* node: orange -> white
         #* edges: orange -> black
@@ -45,7 +53,7 @@ def dijkstras(graphAdjacencyList, edgeWeights, source, isOriented):
             currentEdge = f"{processing}-{neighbor}" 
             reverseEdge = f"{neighbor}-{processing}"
 
-            if nodeStatus[neighbor] == "unvisited":
+            if nodeStatus[neighbor] != "visited":
                 edgeStatus[currentEdge] = "processing"
                 
                 if (processing, neighbor) in edgeWeights:
@@ -56,9 +64,12 @@ def dijkstras(graphAdjacencyList, edgeWeights, source, isOriented):
                         heapq.heappush(prioQueue, (competition, neighbor))
                         nodeStatus[neighbor] = "queued"      
                         edgeStatus[currentEdge] = "queued"
+                        prevNode[neighbor] = processing
 
-                    if not isOriented:
-                        edgeStatus[reverseEdge] = "queued"
+                        if not isOriented:
+                            edgeStatus[reverseEdge] = "queued"
+                    else:
+                        edgeStatus[currentEdge] = "useless"
                     
             elif currentEdge not in edgeStatus:
                 edgeStatus[currentEdge] = "useless"
