@@ -1,15 +1,16 @@
 {
   "graphAdjacencyList": {
-    "a": [],
+    "a": ["b", "c"],
     "b": ["a", "c"],
-    "c": ["a"]
+    "c": ["a", "b"]
   },
   "edgeWeights": [
     ["b-a", 1],
     ["c-a", 1],
-    ["b-c", 1]
+    ["b-c", 1],
+    ["a-b", 1],
+    ["a-c", 1],
+    ["c-b", 1]
   ],
-  "isOriented": true,
   "source": "b"
 }
-

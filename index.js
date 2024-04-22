@@ -89,7 +89,61 @@ app.post("/dijkstra", (req, res) => {
     }
   });
 });
+app.post("/prims", (req, res) => {
+  const {
+    graphAdjacencyList,
+    edgeWeightMap: edgeWeightArray,
+    source,
+  } = req.body;
 
+  // package it up for the script
+  const pythonInput = JSON.stringify({
+    graphAdjacencyList,
+    edgeWeights: edgeWeightArray, // Ensure this matches the Python script's expectations
+    source,
+  });
+
+  // Spawn the Python subprocess
+  const pythonProcess = spawn("python3", ["prims.py"]);
+
+  // Send in data
+  pythonProcess.stdin.write(pythonInput);
+  pythonProcess.stdin.end(); // Indicate that no more data will be sent
+
+  let result = ""; // Initialize an empty string to accumulate data from stdout
+
+  // Handle data event from stdout
+  pythonProcess.stdout.on("data", (data) => {
+    // console.log("Raw output from Python script:", data.toString());
+    result += data.toString();
+  });
+
+  // Handle data event from stderr (log errors, if any)
+  pythonProcess.stderr.on("data", (data) => {
+    console.error(`stderr: ${data.toString()}`);
+  });
+
+  // Handle the close event of the subprocess
+  pythonProcess.on("close", (code) => {
+    if (code === 0) {
+      try {
+        const parsedResult = JSON.parse(result);
+        res.status(200).json(parsedResult);
+      } catch (error) {
+        // Correctly catch and log JSON parsing errors
+        console.error("Error parsing JSON from Python script:", error);
+        res
+          .status(500)
+          .send("Error processing Prims' algorithm due to JSON parsing error.");
+      }
+    } else {
+      // Log a generic error message or include more details if available
+      console.error("Python script exited with code", code);
+      //   console.error("test?");
+      res.status(500).send("Error processing Prims' algorithm");
+    }
+  });
+});
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
