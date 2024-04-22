@@ -37,8 +37,6 @@ app.post("/dijkstra", (req, res) => {
     source,
   } = req.body;
 
-  // console.log(req.body);
-
   // package it up for the script
   const pythonInput = JSON.stringify({
     graphAdjacencyList,
