@@ -28,7 +28,7 @@ app.use(
 // delivery man
 app.use(express.json());
 
-// Define a POST route for the algorithm
+// POST for dijkstra
 app.post("/dijkstra", (req, res) => {
   const {
     graphAdjacencyList,
@@ -71,6 +71,8 @@ app.post("/dijkstra", (req, res) => {
     if (code === 0) {
       try {
         const parsedResult = JSON.parse(result);
+        console.log("Success! Dijjkstra Steps:", parsedResult);
+
         res.status(200).json(parsedResult);
       } catch (error) {
         // Correctly catch and log JSON parsing errors
@@ -89,6 +91,8 @@ app.post("/dijkstra", (req, res) => {
     }
   });
 });
+
+// POST for prims
 app.post("/prims", (req, res) => {
   const {
     graphAdjacencyList,
@@ -102,6 +106,8 @@ app.post("/prims", (req, res) => {
     edgeWeights: edgeWeightArray, // Ensure this matches the Python script's expectations
     source,
   });
+
+  // console.log(pythonInput);
 
   // Spawn the Python subprocess
   const pythonProcess = spawn("python3", ["prims.py"]);
@@ -128,6 +134,8 @@ app.post("/prims", (req, res) => {
     if (code === 0) {
       try {
         const parsedResult = JSON.parse(result);
+        console.log("Success! Prims Steps:", parsedResult);
+
         res.status(200).json(parsedResult);
       } catch (error) {
         // Correctly catch and log JSON parsing errors

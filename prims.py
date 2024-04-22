@@ -65,10 +65,10 @@ def main():
     source = data['source']
     
     # Running Prim's algorithm
-    result = prims(graph, edgeWeights, source)
+    steps = prims(graph, edgeWeights, source)
     
     # Output the result as a JSON
-    print(json.dumps(result, indent=4, sort_keys=True))
+    print(json.dumps(steps, indent=4, sort_keys=True))
 
 if __name__ == "__main__":
     main()
