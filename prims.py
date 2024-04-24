@@ -23,6 +23,8 @@ def prims(graphAdjacencyList, edgeWeights, source):
     nextStep = [(0, source, None)] 
     runningCost = 0
 
+    steps.append({"nodeStatus": dict(nodeStatus), "edgeStatus": dict(edgeStatus), "runningCost": int(runningCost)})
+
     while nextStep:
         cost, processing, prevNode = heapq.heappop(nextStep)
         
