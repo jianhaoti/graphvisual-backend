@@ -34,6 +34,8 @@ def prims(graphAdjacencyList, edgeWeights, source):
         cost, processing, prevNode = heapq.heappop(nextStep)
         
         if nodeStatus[processing] == "visited":
+            edgeStatus[f"{processing}-{prevNode}"] = "useless"
+            edgeStatus[f"{prevNode}-{processing}"] = "useless"
             continue
 
         nodeStatus[processing] = "processing"
@@ -48,15 +50,10 @@ def prims(graphAdjacencyList, edgeWeights, source):
         
         for neighbor in graphAdjacencyList[processing]:
             if nodeStatus[neighbor] != "visited":
-                if nodeStatus[neighbor] == "unvisited":
-                    edgeStatus[f"{processing}-{neighbor}"] = "queued"
-                    edgeStatus[f"{neighbor}-{processing}"] = "queued"
-                    heapq.heappush(nextStep, (edgeWeights[(processing, neighbor)], neighbor, processing))
+                edgeStatus[f"{processing}-{neighbor}"] = "queued"
+                edgeStatus[f"{neighbor}-{processing}"] = "queued"
+                heapq.heappush(nextStep, (edgeWeights[(processing, neighbor)], neighbor, processing))
 
-                else:
-                    edgeStatus[f"{processing}-{neighbor}"] = "useless"
-                    edgeStatus[f"{neighbor}-{processing}"] = "useless"
-                
                 nodeStatus[neighbor] = "queued"
 
 
