@@ -26,25 +26,39 @@ def prims(graphAdjacencyList, edgeWeights, source):
     steps.append({"nodeStatus": dict(nodeStatus), "edgeStatus": dict(edgeStatus), "runningCost": int(runningCost)})
 
     while nextStep:
+        # Print the current state of the heap queue
+        print("Heap queue before popping:", file=sys.stderr)
+        for element in nextStep:
+            print(f"  {element}", file=sys.stderr)
+
         cost, processing, prevNode = heapq.heappop(nextStep)
         
         if nodeStatus[processing] == "visited":
             continue
 
         nodeStatus[processing] = "processing"
+        
 
-        if prevNode is not None:  # If it's not the first node
-            edgeStatus[f"{processing}-{prevNode}"] = "visited"
+        if prevNode is not None:  # If it's not the first node, build the MST 
+            if(edgeStatus[f"{processing}-{prevNode}"]=="queued"):
+                edgeStatus[f"{processing}-{prevNode}"] = "visited"
+                edgeStatus[f"{prevNode}-{processing}"] = "visited"
             runningCost += cost
             steps.append({"nodeStatus": dict(nodeStatus), "edgeStatus": dict(edgeStatus), "runningCost": int(runningCost)})
-
         
         for neighbor in graphAdjacencyList[processing]:
             if nodeStatus[neighbor] != "visited":
-                heapq.heappush(nextStep, (edgeWeights[(processing, neighbor)], neighbor, processing))
-                nodeStatus[neighbor] = "queued"
+                if nodeStatus[neighbor] == "unvisited":
+                    edgeStatus[f"{processing}-{neighbor}"] = "queued"
+                    edgeStatus[f"{neighbor}-{processing}"] = "queued"
+                    heapq.heappush(nextStep, (edgeWeights[(processing, neighbor)], neighbor, processing))
+
+                else:
+                    edgeStatus[f"{processing}-{neighbor}"] = "useless"
+                    edgeStatus[f"{neighbor}-{processing}"] = "useless"
                 
-                edgeStatus[f"{processing}-{neighbor}"] = "queued"
+                nodeStatus[neighbor] = "queued"
+
 
         steps.append({"nodeStatus": dict(nodeStatus), "edgeStatus": dict(edgeStatus), "runningCost": int(runningCost)})
      

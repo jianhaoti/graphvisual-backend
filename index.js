@@ -134,7 +134,7 @@ app.post("/prims", (req, res) => {
     if (code === 0) {
       try {
         const parsedResult = JSON.parse(result);
-        console.log("Success! Prims Steps:", parsedResult);
+        // console.log("Success! Prims Steps:", parsedResult);
 
         res.status(200).json(parsedResult);
       } catch (error) {
